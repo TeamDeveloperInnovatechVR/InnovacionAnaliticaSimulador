@@ -1,168 +1,757 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard · Analitica Simuladores</title>
 
-<title>Dashboard Profesional · Infracciones</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+    <style>
+        /* ===== ESTILOS BASE Y VARIABLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        :root {
+            --orange-primary: #FF9300;
+            --orange-dark: #F38E12;
+            --orange-medium: #F6B166;
+            --orange-light: #FFEED6;
+            --bluegray-dark: #5D5E7A;
+            --bluegray-medium: #8485A0;
+            --bluegray-light: #B4B5C8;
+            --bg-body: #F4F6FA;
+            --white: #FFFFFF;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
+        }
 
-<style>
-body{
-    font-family:'Inter',sans-serif;
-    background:#f4f5fa;
-    padding:20px;
-}
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-body);
+            padding: 24px;
+            color: #1E1F2E;
+        }
 
-.dashboard{
-    max-width:1400px;
-    margin:auto;
-}
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-.card{
-    background:#fff;
-    border-radius:18px;
-    padding:20px;
-    margin-bottom:20px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.05);
-}
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--white);
+            padding: 16px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
 
-h2{
-    margin-bottom:10px;
-    font-size:18px;
-}
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
-.chart{
-    height:350px;
-}
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--orange-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
 
-.tall{
-    height:420px;
-}
+        .header-title h1 {
+            font-size: 22px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-/* KPI EMBRAGUE */
-.kpi{
-    text-align:center;
-}
-.kpi h1{
-    font-size:60px;
-    color:#FF9300;
-}
-.bar{
-    height:20px;
-    background:#eee;
-    border-radius:20px;
-    margin:15px 0;
-    overflow:hidden;
-}
-.fill{
-    height:100%;
-    background:linear-gradient(90deg,#FCD29D,#FF9300);
-}
-</style>
+        .header-title h1 span {
+            color: var(--orange-primary);
+        }
 
+        .header-title .sub {
+            font-size: 13px;
+            color: var(--bluegray-medium);
+            font-weight: 500;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-date {
+            background: #FFF5E6;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--orange-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-generate {
+            padding: 12px 24px;
+            background: var(--orange-primary);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-generate:hover {
+            background: var(--orange-dark);
+        }
+
+        .btn-generate:active {
+            transform: scale(0.98);
+        }
+
+        /* ===== CARD GENERAL ===== */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ECEEF4;
+            padding-bottom: 12px;
+        }
+
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1E1F2E;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* ===== PANEL DE ENTRADAS CONTROLES ===== */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px 20px;
+        }
+
+        .input-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #F8F9FC;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid #E2E4EE;
+        }
+
+        .input-item label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--bluegray-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 8px;
+        }
+
+        .input-item input {
+            width: 70px;
+            padding: 6px;
+            border: 1px solid #C4C7D0;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .input-item input:focus {
+            outline: 2px solid var(--orange-primary);
+            border-color: transparent;
+        }
+
+        /* ===== CUADRÍCULA DE GRÁFICOS ===== */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .chart-box {
+            width: 100%;
+            height: 380px;
+        }
+
+        /* ===== BLOQUE 4: DISEÑO ESPECIAL EMBRAGUE ===== */
+        .embrague-container {
+            display: flex;
+            height: calc(100% - 40px);
+            align-items: center;
+            justify-content: space-around;
+            padding: 20px 0;
+        }
+
+        .embrague-left {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 16px solid #FFF0DB;
+            border-radius: 50%;
+        }
+
+        .embrague-left .num {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--orange-dark);
+        }
+
+        .embrague-left .txt {
+            font-size: 12px;
+            color: var(--bluegray-medium);
+            font-weight: 600;
+        }
+
+        .embrague-right {
+            flex: 1;
+            max-width: 320px;
+            margin-left: 20px;
+        }
+
+        .embrague-desc {
+            font-size: 15px;
+            color: var(--bluegray-dark);
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .embrague-metric-box {
+            background: #F8F9FC;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--bluegray-dark);
+        }
+
+        .metric-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .metric-row strong {
+            font-size: 16px;
+            color: #1E1F2E;
+        }
+
+        /* ===== BLOQUE 5: DISEÑO COLISIONES CON ICONOS ===== */
+        .colisiones-ui-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            height: calc(100% - 40px);
+            align-items: flex-end;
+            padding-top: 20px;
+        }
+
+        .colisiones-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .colisiones-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .colisiones-bar-val {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .colisiones-bar {
+            width: 100%;
+            border-radius: 8px 8px 0 0;
+            min-height: 10px;
+            transition: height 0.5s ease;
+        }
+
+        .colisiones-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--bluegray-dark);
+            text-align: center;
+            margin-top: 12px;
+            min-height: 32px;
+        }
+
+        /* ===== TARJETA DE PASTEL (ocupa ambas columnas) ===== */
+        .card-full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-banner {
+            background: #1E1F30;
+            color: var(--white);
+            padding: 14px 24px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .card-full-width {
+                grid-column: 1;
+            }
+        }
+    </style>
 </head>
-
 <body>
-<div class="dashboard">
 
-<div class="card"><h2>⚠️ Errores de conducción eficiente</h2><div id="c1" class="chart"></div></div>
+    <div class="dashboard">
 
-<div class="card"><h2>🛡️ Matriz de infracciones de seguridad</h2><div id="c2" class="chart tall"></div></div>
+        <header class="header">
+            <div class="header-left">
+                <div class="logo-icon">▲</div>
+                <div class="header-title">
+                    <h1>Dashboard <span>Infracciones</span></h1>
+                    <div class="sub">Análisis 3D · Conducción y Seguridad Vial</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-date">
+                    📅 Datos actualizados: <strong>23/06/2026</strong>
+                </div>
+                <button class="btn-generate" onclick="actualizarDashboard()">🔄 Generar todos los gráficos</button>
+            </div>
+        </header>
 
-<div class="card"><h2>📊 Matriz general</h2><div id="c3" class="chart"></div></div>
+        <div class="card">
+            <div class="card-header">
+                <h3>Variables del módulo (SV-MODULO 1)</h3>
+            </div>
+            <div class="input-grid" id="controlesInputs">
+                </div>
+        </div>
 
-<div class="card kpi">
-<h2>🔄 Conducción con embrague pisado</h2>
-<h1 id="valor">0</h1>
-<div class="bar"><div id="barra" class="fill"></div></div>
-<p id="porcentaje"></p>
-</div>
+        <div class="charts-container">
 
-<div class="card"><h2>💥 Matriz de colisión</h2><div id="c4" class="chart"></div></div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>1. Errores de conducción eficiente</h3>
+                </div>
+                <div id="chartEficiente" class="chart-box"></div>
+            </div>
 
-<div class="card"><h2>📜 Falta de normatividad</h2><div id="c5" class="chart"></div></div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>2. Matriz general de infracciones de seguridad</h3>
+                </div>
+                <div id="chartSeguridad" class="chart-box"></div>
+            </div>
 
-<div class="card"><h2>🥧 Distribución general</h2><div id="c6" class="chart"></div></div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>3. Matriz general de infracciones</h3>
+                </div>
+                <div id="chartGeneral" class="chart-box"></div>
+            </div>
 
-</div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>4. Conducción con embrague pisado</h3>
+                </div>
+                <div class="embrague-container">
+                    <div class="embrague-left">
+                        <div class="num" id="embragueNum">885</div>
+                        <div class="txt">Veces</div>
+                    </div>
+                    <div class="embrague-right">
+                        <div class="embrague-desc">Veces que se ha pisado el embrague indebidamente</div>
+                        <div class="embrague-metric-box">
+                            <div class="metric-row">
+                                <span>Porcentaje sobre total</span>
+                                <strong id="embraguePct" style="color:var(--orange-dark)">37.91%</strong>
+                            </div>
+                            <div class="metric-row">
+                                <span>Total infracciones</span>
+                                <strong id="embragueTotal">2,334</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-<script>
+            <div class="card">
+                <div class="card-header">
+                    <h3>5. Matriz de colisión</h3>
+                </div>
+                <div class="colisiones-ui-grid">
+                    <div class="colisiones-column">
+                        <div class="colisiones-icon">🚗</div>
+                        <div class="colisiones-bar-val" id="valColVehiculo">0</div>
+                        <div class="colisiones-bar" id="barColVehiculo" style="background:#5B9BD5;"></div>
+                        <div class="colisiones-label">Colisión con<br>vehículo</div>
+                    </div>
+                    <div class="colisiones-column">
+                        <div class="colisiones-icon">🐾</div>
+                        <div class="colisiones-bar-val" id="valColAnimal">0</div>
+                        <div class="colisiones-bar" id="barColAnimal" style="background:#70AD47;"></div>
+                        <div class="colisiones-label">Colisión con<br>animal</div>
+                    </div>
+                    <div class="colisiones-column">
+                        <div class="colisiones-icon">🚲</div>
+                        <div class="colisiones-bar-val" id="valColBicicleta">0</div>
+                        <div class="colisiones-bar" id="barColBicicleta" style="background:#FFC000;"></div>
+                        <div class="colisiones-label">Colisión con<br>bicicleta</div>
+                    </div>
+                    <div class="colisiones-column">
+                        <div class="colisiones-icon">🚶</div>
+                        <div class="colisiones-bar-val" id="valColPeaton">7</div>
+                        <div class="colisiones-bar" id="barColPeaton" style="background:#ED7D31;"></div>
+                        <div class="colisiones-label">Colisión con<br>peatón</div>
+                    </div>
+                </div>
+            </div>
 
-// ===== DATA =====
-const CATEGORIAS = [
-"Marcha inadecuada","Motor calado","Embrague pisado","Acelerador exceso","Acelerar cambios",
-"Exceso velocidad","Cambio carril","Semáforo rojo","Fuera pista","Stop",
-"Colisión","Vehículo","Animal","Bicicleta","Peatón","Carril reservado","Dirección contraria","Agresiva"
-];
+            <div class="card">
+                <div class="card-header">
+                    <h3>6. Falta de normatividad</h3>
+                </div>
+                <div id="chartNormatividad" class="chart-box"></div>
+            </div>
 
-const VALORES = [0,0,885,0,871,42,280,90,0,129,0,0,0,0,7,0,30,0];
+            <!-- ===== NUEVA TARJETA: GRÁFICO DE PASTEL (ocupa todo el ancho) ===== -->
+            <div class="card card-full-width">
+                <div class="card-header">
+                    <h3>7. Distribución general de infracciones</h3>
+                </div>
+                <div id="chartPie" class="chart-box"></div>
+            </div>
 
-// ===== FUNCIONES =====
-function max(val){ return Math.max(...val,10); }
+        </div>
 
-// 1️⃣ ERRORES EFICIENTE
-echarts.init(document.getElementById('c1')).setOption({
-xAxis:{type:'category',data:CATEGORIAS.slice(0,5)},
-yAxis:{type:'value',max:max(VALORES)},
-series:[{type:'bar',data:VALORES.slice(0,5),itemStyle:{color:'#FF9300'}}]
-});
+        <footer class="footer-banner">
+            <div>🛡️ Seguridad Vial · Conduce seguro, respeta las normas, protege vidas.</div>
+            <div>Dashboard 3D · Infracciones de Conducción</div>
+        </footer>
+    </div>
 
-// 2️⃣ SEGURIDAD (HORIZONTAL)
-const segIndex=[17,16,15,14,13,12,11,10,9,8,7,6,5];
-echarts.init(document.getElementById('c2')).setOption({
-xAxis:{type:'value'},
-yAxis:{type:'category',data:segIndex.map(i=>CATEGORIAS[i])},
-series:[{type:'bar',data:segIndex.map(i=>VALORES[i]),itemStyle:{color:'#5D5E7A'}}]
-});
+    <script>
+        // Mapeo completo de variables indexadas conforme al panel real
+        const VARIABLES_METRICAS = [
+            { key: "cambio_marcha_inadecuado", label: "Cambio de marcha inadecuado", val: 0 },
+            { key: "conducir_motor_calado", label: "Conducir con motor calado", val: 0 },
+            { key: "conduccion_embrague_pisado", label: "Conducción con embrague pisado", val: 885 },
+            { key: "acelerador_pisado_exceso", label: "Acelerador pisado en exceso", val: 0 },
+            { key: "acelerar_entre_cambios", label: "Acelerar entre cambios", val: 871 },
+            { key: "exceso_velocidad", label: "Exceso de velocidad", val: 42 },
+            { key: "cambio_carril_sin_direccionales", label: "Cambio de carril sin direccionales", val: 280 },
+            { key: "no_respetar_luz_roja", label: "No respetar luz roja del semáforo", val: 90 },
+            { key: "fuera_de_pista", label: "Fuera de pista", val: 0 },
+            { key: "stop_no_respetado", label: "Stop no respetado", val: 129 },
+            { key: "colision", label: "Colisión", val: 0 },
+            { key: "colision_vehiculo", label: "Colisión con vehículo", val: 0 },
+            { key: "colision_animal", label: "Colisión con animal", val: 0 },
+            { key: "colision_bicicleta", label: "Colisión con bicicleta", val: 0 },
+            { key: "colision_peaton", label: "Colisión con peatón", val: 7 },
+            { key: "circular_carril_reservado", label: "Circular por carril reservado", val: 0 },
+            { key: "direccion_contraria", label: "Dirección contraria", val: 30 },
+            { key: "conduccion_agresiva", label: "Conducción agresiva", val: 0 }
+        ];
 
-// 3️⃣ GENERAL
-const genIndex=[16,14,12,10,8,6,4,2];
-echarts.init(document.getElementById('c3')).setOption({
-xAxis:{type:'category',data:genIndex.map(i=>CATEGORIAS[i])},
-yAxis:{type:'value'},
-series:[{type:'bar',data:genIndex.map(i=>VALORES[i]),itemStyle:{color:'#F38E12'}}]
-});
+        // Instancias de Gráficos ECharts
+        let chartEficiente, chartSeguridad, chartGeneral, chartNormatividad, chartPie;
 
-// 4️⃣ KPI EMBRAGUE
-let total=VALORES.reduce((a,b)=>a+b,0);
-let emb=VALORES[2];
-let pct=(emb/total)*100;
-document.getElementById("valor").innerText=emb;
-document.getElementById("barra").style.width=pct+"%";
-document.getElementById("porcentaje").innerText=pct.toFixed(1)+"% del total";
+        // Renderizado inicial del panel de control
+        function iniciarPanelControles() {
+            const contenedor = document.getElementById("controlesInputs");
+            contenedor.innerHTML = "";
+            VARIABLES_METRICAS.forEach((item, index) => {
+                const box = document.createElement("div");
+                box.className = "input-item";
+                box.innerHTML = `
+                    <label title="${item.label}">${item.label}</label>
+                    <input type="number" id="input_metric_${index}" value="${item.val}" min="0" onchange="actualizarDashboard()">
+                `;
+                contenedor.appendChild(box);
+            });
+        }
 
-// 5️⃣ COLISION
-const colIndex=[11,12,13,14];
-echarts.init(document.getElementById('c4')).setOption({
-xAxis:{type:'category',data:["🚗 Vehículo","🐕 Animal","🚴 Bicicleta","🚶 Peatón"]},
-yAxis:{type:'value'},
-series:[{type:'bar',data:colIndex.map(i=>VALORES[i])}]
-});
+        // Lectura en tiempo real de los controles de usuario
+        function obtenerDatosActuales() {
+            const dataMap = {};
+            VARIABLES_METRICAS.forEach((item, index) => {
+                const element = document.getElementById(`input_metric_${index}`);
+                const valor = element ? parseInt(element.value) || 0 : item.val;
+                dataMap[item.key] = valor;
+            });
+            return dataMap;
+        }
 
-// 6️⃣ NORMATIVIDAD
-echarts.init(document.getElementById('c5')).setOption({
-xAxis:{type:'category',data:["Velocidad","Carril sin direccional"]},
-yAxis:{type:'value'},
-series:[{type:'bar',data:[VALORES[5],VALORES[6]]}]
-});
+        // ===== GRÁFICO DE PASTEL =====
+        function crearPieChart(id, categorias, valores) {
+            const chartDom = document.getElementById(id);
+            if (!chartDom) return;
+            const chart = echarts.init(chartDom);
 
-// 7️⃣ PIE
-echarts.init(document.getElementById('c6')).setOption({
-series:[{
-type:'pie',
-radius:['40%','70%'],
-data:CATEGORIAS.map((c,i)=>({name:c,value:VALORES[i]}))
-}]
-});
+            const data = categorias.map((c, i) => ({ name: c, value: valores[i] }))
+                .filter(item => item.value > 0);
 
-</script>
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} ({d}%)'
+                },
+                legend: {
+                    orient: 'vertical',
+                    right: '5%',
+                    top: 'center',
+                    textStyle: { fontSize: 12, color: '#1e1f2e' }
+                },
+                series: [{
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['40%', '50%'],
+                    itemStyle: {
+                        borderRadius: 8,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        formatter: '{b}\n{d}%',
+                        fontSize: 12,
+                        fontWeight: 500
+                    },
+                    labelLine: {
+                        length: 10,
+                        length2: 10
+                    },
+                    data: data.length ? data : [{ name: 'Sin datos', value: 1 }]
+                }]
+            };
 
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+            return chart;
+        }
+
+        function actualizarDashboard() {
+            const datos = obtenerDatosActuales();
+            
+            // Cálculo del Valor Sumatorio Total
+            const sumaTotal = Object.values(datos).reduce((acc, current) => acc + current, 0) || 1;
+
+            // 1. RENDER ERRORES DE CONDUCCIÓN EFICIENTE (Barras Verticales)
+            const dEficiente = [
+                datos.cambio_marcha_inadecuado,
+                datos.conducir_motor_calado,
+                datos.conduccion_embrague_pisado,
+                datos.acelerador_pisado_exceso,
+                datos.acelerar_entre_cambios
+            ];
+            chartEficiente.setOption({
+                grid: { top: 40, bottom: 60, left: 50, right: 20 },
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: ['Cambio de\nmarcha inadecuado', 'Conducir con\nmotor calado', 'Conducción con\nembrague pisado', 'Acelerador\npisado en exceso', 'Acelerar entre\ncambios'],
+                    axisLabel: { fontSize: 10, interval: 0 }
+                },
+                yAxis: { type: 'value', max: Math.max(...dEficiente, 1000) },
+                series: [{
+                    data: dEficiente,
+                    type: 'bar',
+                    barWidth: '40%',
+                    itemStyle: { color: '#FF9300', borderRadius: [4, 4, 0, 0] },
+                    label: { show: true, position: 'top', fontStyle: 'normal' }
+                }]
+            });
+
+            // 2. MATRIZ GENERAL DE INFRACCIONES DE SEGURIDAD (Barras Horizontales de Izquierda a Derecha)
+            const cSeguridad = [
+                'Conducción agresiva', 'Dirección contraria', 'Circular por carril reservado',
+                'Colisión con peatón', 'Colisión con bicicleta', 'Colisión con animal',
+                'Colisión con vehículo', 'Colisión', 'Stop no respetado', 'Fuera de pista',
+                'No respetar luz roja del semáforo', 'Cambio de carril sin direccionales', 'Exceso de velocidad'
+            ];
+            const dSeguridad = [
+                datos.conduccion_agresiva, datos.direccion_contraria, datos.circular_carril_reservado,
+                datos.colision_peaton, datos.colision_bicicleta, datos.colision_animal,
+                datos.colision_vehiculo, datos.colision, datos.stop_no_respetado, datos.fuera_de_pista,
+                datos.no_respetar_luz_roja, datos.cambio_carril_sin_direccionales, datos.exceso_velocidad
+            ];
+            chartSeguridad.setOption({
+                grid: { top: 20, bottom: 40, left: 190, right: 30 },
+                tooltip: { trigger: 'axis' },
+                xAxis: { type: 'value', max: Math.max(...dSeguridad, 500) },
+                yAxis: {
+                    type: 'category',
+                    data: cSeguridad,
+                    axisLabel: { fontSize: 10 }
+                },
+                series: [{
+                    data: dSeguridad,
+                    type: 'bar',
+                    itemStyle: { color: '#3A3B52', borderRadius: [0, 4, 4, 0] },
+                    label: { show: true, position: 'right' }
+                }]
+            });
+
+            // 3. MATRIZ GENERAL DE INFRACCIONES
+            const dGeneral = [
+                datos.direccion_contraria, datos.colision_peaton, datos.colision_animal,
+                datos.colision, datos.fuera_de_pista, datos.cambio_carril_sin_direccionales,
+                datos.acelerar_entre_cambios, datos.conduccion_embrague_pisado
+            ];
+            chartGeneral.setOption({
+                grid: { top: 40, bottom: 60, left: 40, right: 20 },
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: ['Dirección\ncontraria', 'Colisión\npeatón', 'Colisión\nanimal', 'Colisión', 'Fuera de\npista', 'Cambio carril\nsin direccionales', 'Acelerar\nentre cambios', 'Conducción\nembrague pisado'],
+                    axisLabel: { fontSize: 9, interval: 0 }
+                },
+                yAxis: { type: 'value', max: Math.max(...dGeneral, 900) },
+                series: [{
+                    data: dGeneral,
+                    type: 'bar',
+                    barWidth: '45%',
+                    itemStyle: { color: '#5D9CEC', borderRadius: [4, 4, 0, 0] },
+                    label: { show: true, position: 'top' }
+                }]
+            });
+
+            // 4. ACTUALIZACIÓN DE TARJETA INTERACTIVA DE EMBRAGUE
+            const vEmbrague = datos.conduccion_embrague_pisado;
+            const pctEmbrague = ((vEmbrague / sumaTotal) * 100).toFixed(2);
+            document.getElementById("embragueNum").innerText = vEmbrague.toLocaleString();
+            document.getElementById("embraguePct").innerText = `${pctEmbrague}%`;
+            document.getElementById("embragueTotal").innerText = sumaTotal.toLocaleString();
+
+            // 5. INTERFAZ GRÁFICA DE MATRIZ DE COLISIÓN (Control de alturas de barras personalizadas)
+            const maxColis = Math.max(datos.colision_vehiculo, datos.colision_animal, datos.colision_bicicleta, datos.colision_peaton, 1);
+            
+            document.getElementById("valColVehiculo").innerText = datos.colision_vehiculo;
+            document.getElementById("barColVehiculo").style.height = `${(datos.colision_vehiculo / maxColis) * 160}px`;
+
+            document.getElementById("valColAnimal").innerText = datos.colision_animal;
+            document.getElementById("barColAnimal").style.height = `${(datos.colision_animal / maxColis) * 160}px`;
+
+            document.getElementById("valColBicicleta").innerText = datos.colision_bicicleta;
+            document.getElementById("barColBicicleta").style.height = `${(datos.colision_bicicleta / maxColis) * 160}px`;
+
+            document.getElementById("valColPeaton").innerText = datos.colision_peaton;
+            document.getElementById("barColPeaton").style.height = `${(datos.colision_peaton / maxColis) * 160}px`;
+
+            // 6. FALTA DE NORMATIVIDAD
+            const dNormas = [datos.exceso_velocidad, datos.cambio_carril_sin_direccionales];
+            chartNormatividad.setOption({
+                grid: { top: 40, bottom: 40, left: 50, right: 50 },
+                tooltip: { trigger: 'axis' },
+                xAxis: {
+                    type: 'category',
+                    data: ['Exceso de velocidad', 'Cambio de carril sin direccionales']
+                },
+                yAxis: { type: 'value', max: Math.max(...dNormas, 300) },
+                series: [{
+                    data: [
+                        { value: datos.exceso_velocidad, itemStyle: { color: '#ED7D31' } },
+                        { value: datos.cambio_carril_sin_direccionales, itemStyle: { color: '#4472C4' } }
+                    ],
+                    type: 'bar',
+                    barWidth: '35%',
+                    label: { show: true, position: 'top' }
+                }]
+            });
+
+            // 7. GRÁFICO DE PASTEL (Distribución general)
+            const todasLasCategorias = VARIABLES_METRICAS.map(item => item.label);
+            const todosLosValores = VARIABLES_METRICAS.map(item => datos[item.key]);
+            crearPieChart('chartPie', todasLasCategorias, todosLosValores);
+        }
+
+        // Inicialización del ecosistema al cargar ventana
+        window.addEventListener('resize', () => {
+            if (chartEficiente) chartEficiente.resize();
+            if (chartSeguridad) chartSeguridad.resize();
+            if (chartGeneral) chartGeneral.resize();
+            if (chartNormatividad) chartNormatividad.resize();
+            if (chartPie) chartPie.resize();
+        });
+
+        window.onload = function () {
+            iniciarPanelControles();
+
+            chartEficiente = echarts.init(document.getElementById('chartEficiente'));
+            chartSeguridad = echarts.init(document.getElementById('chartSeguridad'));
+            chartGeneral = echarts.init(document.getElementById('chartGeneral'));
+            chartNormatividad = echarts.init(document.getElementById('chartNormatividad'));
+            chartPie = echarts.init(document.getElementById('chartPie'));
+
+            actualizarDashboard();
+        };
+    </script>
 </body>
 </html>
