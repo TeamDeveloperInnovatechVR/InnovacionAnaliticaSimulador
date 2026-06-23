@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard Profesional · Infracciones</title>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+    font-family:'Inter',sans-serif;
+    background:#f4f5fa;
+    padding:20px;
+}
+
+.dashboard{
+    max-width:1400px;
+    margin:auto;
+}
+
+.card{
+    background:#fff;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.05);
+}
+
+h2{
+    margin-bottom:10px;
+    font-size:18px;
+}
+
+.chart{
+    height:350px;
+}
+
+.tall{
+    height:420px;
+}
+
+/* KPI EMBRAGUE */
+.kpi{
+    text-align:center;
+}
+.kpi h1{
+    font-size:60px;
+    color:#FF9300;
+}
+.bar{
+    height:20px;
+    background:#eee;
+    border-radius:20px;
+    margin:15px 0;
+    overflow:hidden;
+}
+.fill{
+    height:100%;
+    background:linear-gradient(90deg,#FCD29D,#FF9300);
+}
+</style>
+
+</head>
+
+<body>
+<div class="dashboard">
+
+<div class="card"><h2>⚠️ Errores de conducción eficiente</h2><div id="c1" class="chart"></div></div>
+
+<div class="card"><h2>🛡️ Matriz de infracciones de seguridad</h2><div id="c2" class="chart tall"></div></div>
+
+<div class="card"><h2>📊 Matriz general</h2><div id="c3" class="chart"></div></div>
+
+<div class="card kpi">
+<h2>🔄 Conducción con embrague pisado</h2>
+<h1 id="valor">0</h1>
+<div class="bar"><div id="barra" class="fill"></div></div>
+<p id="porcentaje"></p>
+</div>
+
+<div class="card"><h2>💥 Matriz de colisión</h2><div id="c4" class="chart"></div></div>
+
+<div class="card"><h2>📜 Falta de normatividad</h2><div id="c5" class="chart"></div></div>
+
+<div class="card"><h2>🥧 Distribución general</h2><div id="c6" class="chart"></div></div>
+
+</div>
+
+<script>
+
+// ===== DATA =====
+const CATEGORIAS = [
+"Marcha inadecuada","Motor calado","Embrague pisado","Acelerador exceso","Acelerar cambios",
+"Exceso velocidad","Cambio carril","Semáforo rojo","Fuera pista","Stop",
+"Colisión","Vehículo","Animal","Bicicleta","Peatón","Carril reservado","Dirección contraria","Agresiva"
+];
+
+const VALORES = [0,0,885,0,871,42,280,90,0,129,0,0,0,0,7,0,30,0];
+
+// ===== FUNCIONES =====
+function max(val){ return Math.max(...val,10); }
+
+// 1️⃣ ERRORES EFICIENTE
+echarts.init(document.getElementById('c1')).setOption({
+xAxis:{type:'category',data:CATEGORIAS.slice(0,5)},
+yAxis:{type:'value',max:max(VALORES)},
+series:[{type:'bar',data:VALORES.slice(0,5),itemStyle:{color:'#FF9300'}}]
+});
+
+// 2️⃣ SEGURIDAD (HORIZONTAL)
+const segIndex=[17,16,15,14,13,12,11,10,9,8,7,6,5];
+echarts.init(document.getElementById('c2')).setOption({
+xAxis:{type:'value'},
+yAxis:{type:'category',data:segIndex.map(i=>CATEGORIAS[i])},
+series:[{type:'bar',data:segIndex.map(i=>VALORES[i]),itemStyle:{color:'#5D5E7A'}}]
+});
+
+// 3️⃣ GENERAL
+const genIndex=[16,14,12,10,8,6,4,2];
+echarts.init(document.getElementById('c3')).setOption({
+xAxis:{type:'category',data:genIndex.map(i=>CATEGORIAS[i])},
+yAxis:{type:'value'},
+series:[{type:'bar',data:genIndex.map(i=>VALORES[i]),itemStyle:{color:'#F38E12'}}]
+});
+
+// 4️⃣ KPI EMBRAGUE
+let total=VALORES.reduce((a,b)=>a+b,0);
+let emb=VALORES[2];
+let pct=(emb/total)*100;
+document.getElementById("valor").innerText=emb;
+document.getElementById("barra").style.width=pct+"%";
+document.getElementById("porcentaje").innerText=pct.toFixed(1)+"% del total";
+
+// 5️⃣ COLISION
+const colIndex=[11,12,13,14];
+echarts.init(document.getElementById('c4')).setOption({
+xAxis:{type:'category',data:["🚗 Vehículo","🐕 Animal","🚴 Bicicleta","🚶 Peatón"]},
+yAxis:{type:'value'},
+series:[{type:'bar',data:colIndex.map(i=>VALORES[i])}]
+});
+
+// 6️⃣ NORMATIVIDAD
+echarts.init(document.getElementById('c5')).setOption({
+xAxis:{type:'category',data:["Velocidad","Carril sin direccional"]},
+yAxis:{type:'value'},
+series:[{type:'bar',data:[VALORES[5],VALORES[6]]}]
+});
+
+// 7️⃣ PIE
+echarts.init(document.getElementById('c6')).setOption({
+series:[{
+type:'pie',
+radius:['40%','70%'],
+data:CATEGORIAS.map((c,i)=>({name:c,value:VALORES[i]}))
+}]
+});
+
+</script>
+
+</body>
+</html>
