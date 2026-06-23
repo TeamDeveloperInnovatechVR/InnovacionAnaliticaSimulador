@@ -287,10 +287,10 @@
         /* ===== BLOQUE 5: DISEÑO COLISIONES CON ICONOS ===== */
         .colisiones-ui-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: 1fr;
             gap: 16px;
             height: calc(100% - 40px);
-            align-items: flex-end;
+            align-items: center;
             padding-top: 20px;
         }
 
@@ -299,34 +299,33 @@
             flex-direction: column;
             align-items: center;
             height: 100%;
-            justify-content: flex-end;
+            justify-content: center;
         }
 
         .colisiones-icon {
-            font-size: 28px;
+            font-size: 48px;
             margin-bottom: 8px;
         }
 
         .colisiones-bar-val {
             font-weight: 700;
-            font-size: 14px;
+            font-size: 24px;
             margin-bottom: 8px;
         }
 
         .colisiones-bar {
-            width: 100%;
-            border-radius: 8px 8px 0 0;
-            min-height: 10px;
-            transition: height 0.5s ease;
+            width: 60%;
+            border-radius: 4px;
+            min-height: 16px;
+            transition: width 0.5s ease;
         }
 
         .colisiones-label {
-            font-size: 11px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--bluegray-dark);
             text-align: center;
             margin-top: 12px;
-            min-height: 32px;
         }
 
         /* ===== TARJETA DE PASTEL (ocupa ambas columnas) ===== */
@@ -375,7 +374,7 @@
             <div class="header-left">
                 <div class="logo-icon">▲</div>
                 <div class="header-title">
-                    <h1>Dashboard <span>Analitica Simuladores<</span></h1>
+                    <h1>Dashboard <span>Analitica Simuladores</span></h1>
                     <div class="sub">Análisis 3D · Conducción y Seguridad Vial</div>
                 </div>
             </div>
@@ -391,8 +390,7 @@
             <div class="card-header">
                 <h3>Variables del módulo (SV-MODULO 1)</h3>
             </div>
-            <div class="input-grid" id="controlesInputs">
-                </div>
+            <div class="input-grid" id="controlesInputs"></div>
         </div>
 
         <div class="charts-container">
@@ -432,11 +430,11 @@
                         <div class="embrague-metric-box">
                             <div class="metric-row">
                                 <span>Porcentaje sobre total</span>
-                                <strong id="embraguePct" style="color:var(--orange-dark)">37.91%</strong>
+                                <strong id="embraguePct" style="color:var(--orange-dark)">0%</strong>
                             </div>
                             <div class="metric-row">
                                 <span>Total infracciones</span>
-                                <strong id="embragueTotal">2,334</strong>
+                                <strong id="embragueTotal">0</strong>
                             </div>
                         </div>
                     </div>
@@ -449,28 +447,10 @@
                 </div>
                 <div class="colisiones-ui-grid">
                     <div class="colisiones-column">
-                        <div class="colisiones-icon">🚗</div>
-                        <div class="colisiones-bar-val" id="valColVehiculo">0</div>
-                        <div class="colisiones-bar" id="barColVehiculo" style="background:#5B9BD5;"></div>
-                        <div class="colisiones-label">Colisión con<br>vehículo</div>
-                    </div>
-                    <div class="colisiones-column">
-                        <div class="colisiones-icon">🐾</div>
-                        <div class="colisiones-bar-val" id="valColAnimal">0</div>
-                        <div class="colisiones-bar" id="barColAnimal" style="background:#70AD47;"></div>
-                        <div class="colisiones-label">Colisión con<br>animal</div>
-                    </div>
-                    <div class="colisiones-column">
-                        <div class="colisiones-icon">🚲</div>
-                        <div class="colisiones-bar-val" id="valColBicicleta">0</div>
-                        <div class="colisiones-bar" id="barColBicicleta" style="background:#FFC000;"></div>
-                        <div class="colisiones-label">Colisión con<br>bicicleta</div>
-                    </div>
-                    <div class="colisiones-column">
                         <div class="colisiones-icon">🚶</div>
                         <div class="colisiones-bar-val" id="valColPeaton">7</div>
-                        <div class="colisiones-bar" id="barColPeaton" style="background:#ED7D31;"></div>
-                        <div class="colisiones-label">Colisión con<br>peatón</div>
+                        <div class="colisiones-bar" id="barColPeaton" style="background:#ED7D31; height: 20px;"></div>
+                        <div class="colisiones-label">Colisión con peatón</div>
                     </div>
                 </div>
             </div>
@@ -482,7 +462,6 @@
                 <div id="chartNormatividad" class="chart-box"></div>
             </div>
 
-            <!-- ===== NUEVA TARJETA: GRÁFICO DE PASTEL (ocupa todo el ancho) ===== -->
             <div class="card card-full-width">
                 <div class="card-header">
                     <h3>7. Distribución general de infracciones</h3>
@@ -499,26 +478,16 @@
     </div>
 
     <script>
-        // Mapeo completo de variables indexadas conforme al panel real
+        // Mapeo único con las 8 variables especificadas
         const VARIABLES_METRICAS = [
-            { key: "cambio_marcha_inadecuado", label: "Cambio de marcha inadecuado", val: 0 },
-            { key: "conducir_motor_calado", label: "Conducir con motor calado", val: 0 },
             { key: "conduccion_embrague_pisado", label: "Conducción con embrague pisado", val: 885 },
-            { key: "acelerador_pisado_exceso", label: "Acelerador pisado en exceso", val: 0 },
             { key: "acelerar_entre_cambios", label: "Acelerar entre cambios", val: 871 },
             { key: "exceso_velocidad", label: "Exceso de velocidad", val: 42 },
             { key: "cambio_carril_sin_direccionales", label: "Cambio de carril sin direccionales", val: 280 },
             { key: "no_respetar_luz_roja", label: "No respetar luz roja del semáforo", val: 90 },
-            { key: "fuera_de_pista", label: "Fuera de pista", val: 0 },
             { key: "stop_no_respetado", label: "Stop no respetado", val: 129 },
-            { key: "colision", label: "Colisión", val: 0 },
-            { key: "colision_vehiculo", label: "Colisión con vehículo", val: 0 },
-            { key: "colision_animal", label: "Colisión con animal", val: 0 },
-            { key: "colision_bicicleta", label: "Colisión con bicicleta", val: 0 },
             { key: "colision_peaton", label: "Colisión con peatón", val: 7 },
-            { key: "circular_carril_reservado", label: "Circular por carril reservado", val: 0 },
-            { key: "direccion_contraria", label: "Dirección contraria", val: 30 },
-            { key: "conduccion_agresiva", label: "Conducción agresiva", val: 0 }
+            { key: "direccion_contraria", label: "Dirección contraria", val: 30 }
         ];
 
         // Instancias de Gráficos ECharts
@@ -554,7 +523,9 @@
         function crearPieChart(id, categorias, valores) {
             const chartDom = document.getElementById(id);
             if (!chartDom) return;
-            const chart = echarts.init(chartDom);
+            
+            // Re-inicializar si ya existía para evitar duplicados en renderizado continuo
+            const chart = echarts.getInstanceByDom(chartDom) || echarts.init(chartDom);
 
             const data = categorias.map((c, i) => ({ name: c, value: valores[i] }))
                 .filter(item => item.value > 0);
@@ -593,7 +564,6 @@
             };
 
             chart.setOption(option);
-            window.addEventListener('resize', () => chart.resize());
             return chart;
         }
 
@@ -603,12 +573,9 @@
             // Cálculo del Valor Sumatorio Total
             const sumaTotal = Object.values(datos).reduce((acc, current) => acc + current, 0) || 1;
 
-            // 1. RENDER ERRORES DE CONDUCCIÓN EFICIENTE (Barras Verticales)
+            // 1. RENDER ERRORES DE CONDUCCIÓN EFICIENTE (Solo las variables eficientes disponibles)
             const dEficiente = [
-                datos.cambio_marcha_inadecuado,
-                datos.conducir_motor_calado,
                 datos.conduccion_embrague_pisado,
-                datos.acelerador_pisado_exceso,
                 datos.acelerar_entre_cambios
             ];
             chartEficiente.setOption({
@@ -616,34 +583,30 @@
                 tooltip: { trigger: 'axis' },
                 xAxis: {
                     type: 'category',
-                    data: ['Cambio de\nmarcha inadecuado', 'Conducir con\nmotor calado', 'Conducción con\nembrague pisado', 'Acelerador\npisado en exceso', 'Acelerar entre\ncambios'],
-                    axisLabel: { fontSize: 10, interval: 0 }
+                    data: ['Conducción con\nembrague pisado', 'Acelerar entre\ncambios'],
+                    axisLabel: { fontSize: 11, interval: 0 }
                 },
                 yAxis: { type: 'value', max: Math.max(...dEficiente, 1000) },
                 series: [{
                     data: dEficiente,
                     type: 'bar',
-                    barWidth: '40%',
+                    barWidth: '30%',
                     itemStyle: { color: '#FF9300', borderRadius: [4, 4, 0, 0] },
-                    label: { show: true, position: 'top', fontStyle: 'normal' }
+                    label: { show: true, position: 'top' }
                 }]
             });
 
-            // 2. MATRIZ GENERAL DE INFRACCIONES DE SEGURIDAD (Barras Horizontales de Izquierda a Derecha)
+            // 2. MATRIZ GENERAL DE INFRACCIONES DE SEGURIDAD (Todas las de seguridad vial disponibles)
             const cSeguridad = [
-                'Conducción agresiva', 'Dirección contraria', 'Circular por carril reservado',
-                'Colisión con peatón', 'Colisión con bicicleta', 'Colisión con animal',
-                'Colisión con vehículo', 'Colisión', 'Stop no respetado', 'Fuera de pista',
-                'No respetar luz roja del semáforo', 'Cambio de carril sin direccionales', 'Exceso de velocidad'
+                'Dirección contraria', 'Colisión con peatón', 'Stop no respetado', 
+                'No respetar luz roja', 'Cambio de carril', 'Exceso velocidad'
             ];
             const dSeguridad = [
-                datos.conduccion_agresiva, datos.direccion_contraria, datos.circular_carril_reservado,
-                datos.colision_peaton, datos.colision_bicicleta, datos.colision_animal,
-                datos.colision_vehiculo, datos.colision, datos.stop_no_respetado, datos.fuera_de_pista,
+                datos.direccion_contraria, datos.colision_peaton, datos.stop_no_respetado,
                 datos.no_respetar_luz_roja, datos.cambio_carril_sin_direccionales, datos.exceso_velocidad
             ];
             chartSeguridad.setOption({
-                grid: { top: 20, bottom: 40, left: 190, right: 30 },
+                grid: { top: 20, bottom: 40, left: 150, right: 30 },
                 tooltip: { trigger: 'axis' },
                 xAxis: { type: 'value', max: Math.max(...dSeguridad, 500) },
                 yAxis: {
@@ -659,10 +622,9 @@
                 }]
             });
 
-            // 3. MATRIZ GENERAL DE INFRACCIONES
+            // 3. MATRIZ GENERAL DE INFRACCIONES (Se reajusta a las variables filtradas más representativas)
             const dGeneral = [
-                datos.direccion_contraria, datos.colision_peaton, datos.colision_animal,
-                datos.colision, datos.fuera_de_pista, datos.cambio_carril_sin_direccionales,
+                datos.direccion_contraria, datos.colision_peaton, datos.cambio_carril_sin_direccionales,
                 datos.acelerar_entre_cambios, datos.conduccion_embrague_pisado
             ];
             chartGeneral.setOption({
@@ -670,14 +632,14 @@
                 tooltip: { trigger: 'axis' },
                 xAxis: {
                     type: 'category',
-                    data: ['Dirección\ncontraria', 'Colisión\npeatón', 'Colisión\nanimal', 'Colisión', 'Fuera de\npista', 'Cambio carril\nsin direccionales', 'Acelerar\nentre cambios', 'Conducción\nembrague pisado'],
+                    data: ['Dirección\ncontraria', 'Colisión\npeatón', 'Cambio carril\nsin direccionales', 'Acelerar\nentre cambios', 'Conducción\nembrague pisado'],
                     axisLabel: { fontSize: 9, interval: 0 }
                 },
                 yAxis: { type: 'value', max: Math.max(...dGeneral, 900) },
                 series: [{
                     data: dGeneral,
                     type: 'bar',
-                    barWidth: '45%',
+                    barWidth: '40%',
                     itemStyle: { color: '#5D9CEC', borderRadius: [4, 4, 0, 0] },
                     label: { show: true, position: 'top' }
                 }]
@@ -690,49 +652,39 @@
             document.getElementById("embraguePct").innerText = `${pctEmbrague}%`;
             document.getElementById("embragueTotal").innerText = sumaTotal.toLocaleString();
 
-            // 5. INTERFAZ GRÁFICA DE MATRIZ DE COLISIÓN (Control de alturas de barras personalizadas)
-            const maxColis = Math.max(datos.colision_vehiculo, datos.colision_animal, datos.colision_bicicleta, datos.colision_peaton, 1);
-            
-            document.getElementById("valColVehiculo").innerText = datos.colision_vehiculo;
-            document.getElementById("barColVehiculo").style.height = `${(datos.colision_vehiculo / maxColis) * 160}px`;
-
-            document.getElementById("valColAnimal").innerText = datos.colision_animal;
-            document.getElementById("barColAnimal").style.height = `${(datos.colision_animal / maxColis) * 160}px`;
-
-            document.getElementById("valColBicicleta").innerText = datos.colision_bicicleta;
-            document.getElementById("barColBicicleta").style.height = `${(datos.colision_bicicleta / maxColis) * 160}px`;
-
+            // 5. INTERFAZ GRÁFICA DE MATRIZ DE COLISIÓN (Solo cuenta con Peatón)
             document.getElementById("valColPeaton").innerText = datos.colision_peaton;
-            document.getElementById("barColPeaton").style.height = `${(datos.colision_peaton / maxColis) * 160}px`;
 
-            // 6. FALTA DE NORMATIVIDAD
-            const dNormas = [datos.exceso_velocidad, datos.cambio_carril_sin_direccionales];
+            // 6. FALTA DE NORMATIVIDAD (Exceso de velocidad, cambio carril, no respetar luz roja, stop)
+            const dNormas = [datos.exceso_velocidad, datos.cambio_carril_sin_direccionales, datos.no_respetar_luz_roja, datos.stop_no_respetado];
             chartNormatividad.setOption({
-                grid: { top: 40, bottom: 40, left: 50, right: 50 },
+                grid: { top: 40, bottom: 40, left: 50, right: 20 },
                 tooltip: { trigger: 'axis' },
                 xAxis: {
                     type: 'category',
-                    data: ['Exceso de velocidad', 'Cambio de carril sin direccionales']
+                    data: ['Exceso Velocidad', 'Cambio Carril', 'Luz Roja', 'Stop']
                 },
                 yAxis: { type: 'value', max: Math.max(...dNormas, 300) },
                 series: [{
                     data: [
                         { value: datos.exceso_velocidad, itemStyle: { color: '#ED7D31' } },
-                        { value: datos.cambio_carril_sin_direccionales, itemStyle: { color: '#4472C4' } }
+                        { value: datos.cambio_carril_sin_direccionales, itemStyle: { color: '#4472C4' } },
+                        { value: datos.no_respetar_luz_roja, itemStyle: { color: '#A5A5A5' } },
+                        { value: datos.stop_no_respetado, itemStyle: { color: '#FFC000' } }
                     ],
                     type: 'bar',
-                    barWidth: '35%',
+                    barWidth: '45%',
                     label: { show: true, position: 'top' }
                 }]
             });
 
-            // 7. GRÁFICO DE PASTEL (Distribución general)
+            // 7. GRÁFICO DE PASTEL (Distribución general completa)
             const todasLasCategorias = VARIABLES_METRICAS.map(item => item.label);
             const todosLosValores = VARIABLES_METRICAS.map(item => datos[item.key]);
-            crearPieChart('chartPie', todasLasCategorias, todosLosValores);
+            chartPie = crearPieChart('chartPie', todasLasCategorias, todosLosValores);
         }
 
-        // Inicialización del ecosistema al cargar ventana
+        // Inicialización del ecosistema al cargar ventana y redimensionamiento
         window.addEventListener('resize', () => {
             if (chartEficiente) chartEficiente.resize();
             if (chartSeguridad) chartSeguridad.resize();
@@ -748,7 +700,6 @@
             chartSeguridad = echarts.init(document.getElementById('chartSeguridad'));
             chartGeneral = echarts.init(document.getElementById('chartGeneral'));
             chartNormatividad = echarts.init(document.getElementById('chartNormatividad'));
-            chartPie = echarts.init(document.getElementById('chartPie'));
 
             actualizarDashboard();
         };
